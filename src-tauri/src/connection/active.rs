@@ -8,8 +8,6 @@ use super::store::ConnectionStore;
 
 pub struct ActiveConnection {
     pub profile_id: String,
-    // Read by the query-execution feature, not yet built.
-    #[allow(dead_code)]
     pub client: tokio_postgres::Client,
     pub driver_handle: JoinHandle<()>,
 }

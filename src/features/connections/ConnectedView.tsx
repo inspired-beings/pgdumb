@@ -1,5 +1,6 @@
 import type { ConnectionProfile } from "../../types/connection";
 import { disconnectFromDatabase } from "../../api/connections";
+import { QueryPanel } from "./QueryPanel";
 
 interface ConnectedViewProps {
   profile: ConnectionProfile;
@@ -14,11 +15,17 @@ export function ConnectedView({ profile, onDisconnected }: ConnectedViewProps) {
 
   return (
     <div className="connected-view">
-      <h1>Connected to {profile.name}</h1>
-      <p>
-        {profile.user}@{profile.host}:{profile.port}/{profile.database}
-      </p>
-      <button onClick={handleDisconnect}>Disconnect</button>
+      <div className="connected-view__header">
+        <div>
+          <h1>{profile.name}</h1>
+          <p>
+            {profile.user}@{profile.host}:{profile.port}/{profile.database}
+          </p>
+        </div>
+        <button onClick={handleDisconnect}>Disconnect</button>
+      </div>
+
+      <QueryPanel />
     </div>
   );
 }

@@ -2,6 +2,8 @@ use serde::Deserialize;
 use tauri::State;
 use uuid::Uuid;
 
+use crate::error::describe_postgres_error;
+
 use super::active::{ActiveConnection, AppState};
 use super::credentials::CredentialStore;
 use super::profile::{ConnectionProfile, SslMode};
@@ -74,16 +76,6 @@ fn build_config(
     config
 }
 
-// `tokio_postgres::Error`'s `Display` just writes "db error" for any DB-kind
-// error (e.g. auth failures) - the real message lives on the wrapped
-// `DbError`, reachable only via `as_db_error()`/`source()`.
-fn describe_error(error: &tokio_postgres::Error) -> String {
-    match error.as_db_error() {
-        Some(db_error) => db_error.to_string(),
-        None => error.to_string(),
-    }
-}
-
 fn resolve_password(
     profile: &ConnectionProfile,
     provided: Option<String>,
@@ -154,7 +146,7 @@ pub async fn connect(
     );
 
     let tls = super::tls::connector()?;
-    let (client, connection) = config.connect(tls).await.map_err(|e| describe_error(&e))?;
+    let (client, connection) = config.connect(tls).await.map_err(|e| describe_postgres_error(&e))?;
     let driver_handle = tokio::spawn(async move {
         let _ = connection.await;
     });
@@ -200,7 +192,7 @@ pub async fn test_connection(input: TestConnectionInput) -> Result<(), String> {
     );
 
     let tls = super::tls::connector()?;
-    let (client, connection) = config.connect(tls).await.map_err(|e| describe_error(&e))?;
+    let (client, connection) = config.connect(tls).await.map_err(|e| describe_postgres_error(&e))?;
     drop(client);
     drop(connection);
     Ok(())

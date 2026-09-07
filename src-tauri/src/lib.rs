@@ -1,4 +1,6 @@
 mod connection;
+mod error;
+mod query;
 
 use std::sync::Arc;
 
@@ -30,6 +32,7 @@ pub fn run() {
             connection::commands::connect,
             connection::commands::test_connection,
             connection::commands::disconnect,
+            query::commands::execute_query,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
