@@ -1,0 +1,32 @@
+# Miscellaneous
+*.log
+.DS_Store
+.env
+.env.local
+
+# IntelliJ related
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# The .vscode folder contains launch configuration and tasks you configure in
+# VS Code which you may wish to be included in version control, so this line
+# is commented out by default.
+#.vscode/
+
+# Rust
+/target/
+/src-tauri/target/
+
+# Node/Bun
+node_modules/
+/dist/
+.vite/
+
+# Tauri
+/src-tauri/gen/
+
+# Local-only working files
+/AGENTS.md
+/CLAUDE.md

@@ -14,3 +14,10 @@ Unlike full admin tools such as pgAdmin or DBeaver, pgDumb doesn't manage your d
 - [ ] SQL syntax highlighting
 - [ ] SQL auto-formatting
 
+## Develop
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md).
+
+## License
+
+[AGPL-3.0](./LICENSE.md).
