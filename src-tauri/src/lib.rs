@@ -30,6 +30,7 @@ pub fn run() {
             connection::commands::delete_connection,
             connection::commands::connect,
             connection::commands::disconnect,
+            query::commands::execute_query,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
