@@ -1,4 +1,5 @@
 mod connection;
+mod query;
 
 use std::sync::Arc;
 
