@@ -1,5 +1,6 @@
 const TWO_WORD_VERBS: &[&str] = &["CREATE", "DROP", "ALTER"];
 const COUNTED_VERBS: &[&str] = &["UPDATE", "DELETE"];
+const SKIPPED_SECOND_TOKENS: &[&str] = &["OR", "REPLACE"];
 
 pub fn split_statements(sql: &str) -> Vec<String> {
     let mut parts: Vec<String> = sql.split(';').map(|s| s.trim().to_string()).collect();
@@ -12,13 +13,16 @@ pub fn split_statements(sql: &str) -> Vec<String> {
 pub fn reconstruct_tag(statement: &str, affected_rows: u64) -> String {
     let tokens: Vec<String> = statement
         .split_whitespace()
-        .take(2)
         .map(|t| t.to_uppercase())
         .collect();
     let verb = tokens.first().cloned().unwrap_or_default();
 
     let label = if TWO_WORD_VERBS.contains(&verb.as_str()) {
-        match tokens.get(1) {
+        match tokens
+            .iter()
+            .skip(1)
+            .find(|t| !SKIPPED_SECOND_TOKENS.contains(&t.as_str()))
+        {
             Some(second) => format!("{verb} {second}"),
             None => verb.clone(),
         }
@@ -81,6 +85,18 @@ mod tests {
         assert_eq!(reconstruct_tag("CREATE TABLE t (id int)", 0), "CREATE TABLE");
         assert_eq!(reconstruct_tag("DROP INDEX idx_t", 0), "DROP INDEX");
         assert_eq!(reconstruct_tag("ALTER TABLE t ADD COLUMN y int", 0), "ALTER TABLE");
+    }
+
+    #[test]
+    fn create_or_replace_skips_the_or_replace_modifier_for_the_object_type_token() {
+        assert_eq!(
+            reconstruct_tag("CREATE OR REPLACE FUNCTION foo() RETURNS int AS $$ ... $$", 0),
+            "CREATE FUNCTION"
+        );
+        assert_eq!(
+            reconstruct_tag("CREATE OR REPLACE VIEW v AS SELECT 1", 0),
+            "CREATE VIEW"
+        );
     }
 
     #[test]
