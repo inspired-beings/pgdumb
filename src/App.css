@@ -16,7 +16,7 @@
 
 .app {
   margin: 0 auto;
-  max-width: 640px;
+  max-width: 100%;
   padding: 2rem 1.5rem;
 }
 
@@ -76,6 +76,7 @@
 
 input,
 select,
+textarea,
 button {
   border-radius: 8px;
   border: 1px solid #d0d0d0;
@@ -96,6 +97,60 @@ button:hover {
   border-color: #396cd8;
 }
 
+.connected-view__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.query-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.query-panel__input {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  resize: vertical;
+}
+
+.query-panel__actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.query-panel__transcript {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.query-panel__entry {
+  border-top: 1px solid #d0d0d0;
+  padding-top: 0.75rem;
+}
+
+.query-panel__echo {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  color: #666666;
+  margin: 0 0 0.5rem;
+}
+
+.query-result {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  overflow-x: auto;
+  margin: 0.25rem 0;
+}
+
+.query-result--tag {
+  color: #396cd8;
+}
+
+.query-result--error {
+  color: #c0392b;
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
     color: #f6f6f6;
@@ -109,9 +164,18 @@ button:hover {
 
   input,
   select,
+  textarea,
   button {
     color: #ffffff;
     background-color: #0f0f0f98;
     border-color: #555555;
+  }
+
+  .query-panel__entry {
+    border-top-color: #555555;
+  }
+
+  .query-panel__echo {
+    color: #aaaaaa;
   }
 }
