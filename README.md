@@ -9,7 +9,7 @@ Unlike full admin tools such as pgAdmin or DBeaver, pgDumb doesn't manage your d
 - [x] Connection management and selection
 - [ ] Connection-level meta-commands (`\l`, `\du`, `\conninfo`, …) for the selected connection, with raw output
 - [ ] Database list and selection
-- [ ] SQL query execution with raw output
+- [x] SQL query execution with raw output
 - [ ] Database-level meta-commands (`\d*`) for the selected database, with raw output
 - [ ] SQL syntax highlighting
 - [ ] SQL auto-formatting
