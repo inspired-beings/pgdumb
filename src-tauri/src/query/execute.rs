@@ -1,6 +1,8 @@
+use futures_util::StreamExt;
 use serde::Serialize;
+use tokio_postgres::{Client, SimpleQueryMessage};
 
-use super::tag::reconstruct_tag;
+use super::tag::{reconstruct_tag, split_statements};
 
 pub const MAX_ROWS_PER_STATEMENT: usize = 10_000;
 
@@ -90,6 +92,43 @@ impl OutcomeBuilder {
     fn finish(self) -> Vec<StatementOutcome> {
         self.outcomes
     }
+}
+
+pub async fn execute(client: &Client, sql: &str) -> Result<Vec<StatementOutcome>, String> {
+    let statement_texts = split_statements(sql);
+    let mut builder = OutcomeBuilder::new(MAX_ROWS_PER_STATEMENT);
+
+    let stream = client
+        .simple_query_raw(sql)
+        .await
+        .map_err(|e| e.to_string())?;
+    let mut stream = Box::pin(stream);
+
+    while let Some(message) = stream.next().await {
+        match message {
+            Ok(SimpleQueryMessage::RowDescription(columns)) => {
+                builder.on_row_description(columns.iter().map(|c| c.name().to_string()).collect());
+            }
+            Ok(SimpleQueryMessage::Row(row)) => {
+                let mut values = Vec::with_capacity(row.len());
+                for i in 0..row.len() {
+                    let value = row.try_get(i).map_err(|e| e.to_string())?;
+                    values.push(value.map(str::to_string));
+                }
+                builder.on_row(values);
+            }
+            Ok(SimpleQueryMessage::CommandComplete(count)) => {
+                builder.on_command_complete(count, &statement_texts);
+            }
+            Ok(_) => {}
+            Err(e) => {
+                builder.on_error(e.to_string());
+                break;
+            }
+        }
+    }
+
+    Ok(builder.finish())
 }
 
 #[cfg(test)]
