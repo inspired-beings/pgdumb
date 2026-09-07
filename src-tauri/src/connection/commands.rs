@@ -85,10 +85,10 @@ pub async fn save_connection(
 #[tauri::command]
 pub async fn delete_connection(state: State<'_, AppState>, id: String) -> Result<(), String> {
     let mut active = state.active_connection.lock().await;
-    if active.as_ref().map(|c| c.profile_id == id).unwrap_or(false) {
-        if let Some(connection) = active.take() {
-            connection.stop();
-        }
+    if active.as_ref().map(|c| c.profile_id == id).unwrap_or(false)
+        && let Some(connection) = active.take()
+    {
+        connection.stop();
     }
     drop(active);
 

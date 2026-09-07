@@ -4,6 +4,8 @@ pub trait CredentialStore: Send + Sync {
     fn get(&self, id: &str) -> Result<Option<String>, String>;
     fn set(&self, id: &str, password: &str) -> Result<(), String>;
     fn delete(&self, id: &str) -> Result<(), String>;
+    // Read by the "remember password" checkbox availability check, not yet wired into the UI.
+    #[allow(dead_code)]
     fn is_available(&self) -> bool;
 }
 
