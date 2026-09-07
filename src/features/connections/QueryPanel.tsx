@@ -1,7 +1,10 @@
-import { useState, type KeyboardEvent } from "react";
+import { useEffect, useState } from "react";
 import type { StatementOutcome } from "../../types/query";
 import { executeQuery } from "../../api/query";
 import { QueryResultBlock } from "./QueryResultBlock";
+import { SqlEditor } from "./editor/SqlEditor";
+import { SplitView } from "../../components/SplitView";
+import { getSplitOrientation, setSplitOrientation, type SplitOrientation } from "../../lib/settings";
 
 interface QueryResult {
   outcomes?: StatementOutcome[];
@@ -12,6 +15,11 @@ export function QueryPanel() {
   const [sql, setSql] = useState("");
   const [result, setResult] = useState<QueryResult | null>(null);
   const [running, setRunning] = useState(false);
+  const [orientation, setOrientation] = useState<SplitOrientation>("vertical");
+
+  useEffect(() => {
+    getSplitOrientation().then(setOrientation);
+  }, []);
 
   async function run() {
     const trimmed = sql.trim();
@@ -28,38 +36,41 @@ export function QueryPanel() {
     }
   }
 
-  function handleKeyDown(event: KeyboardEvent<HTMLTextAreaElement>) {
-    if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
-      event.preventDefault();
-      run();
-    }
+  async function toggleOrientation() {
+    const next: SplitOrientation = orientation === "vertical" ? "horizontal" : "vertical";
+    setOrientation(next);
+    await setSplitOrientation(next);
   }
 
   return (
     <div className="query-panel">
-      <textarea
-        className="query-panel__input"
-        value={sql}
-        onChange={(e) => setSql(e.currentTarget.value)}
-        onKeyDown={handleKeyDown}
-        placeholder="SQL to run (Ctrl/Cmd+Enter to run)"
-        rows={4}
-      />
-
       <div className="query-panel__actions">
         <button onClick={run} disabled={running || sql.trim() === ""}>
           {running ? "Running…" : "Run"}
         </button>
+        <button
+          className="query-panel__orientation-toggle"
+          onClick={toggleOrientation}
+          aria-label="Toggle split orientation"
+          title={orientation === "vertical" ? "Switch to stacked layout" : "Switch to side-by-side layout"}
+        >
+          {orientation === "vertical" ? "⬍" : "⬌"}
+        </button>
       </div>
 
-      {result && (
-        <div className="query-panel__result">
-          {result.error && <p className="query-result query-result--error">{result.error}</p>}
-          {result.outcomes?.map((outcome, i) => (
-            <QueryResultBlock key={i} outcome={outcome} />
-          ))}
-        </div>
-      )}
+      <SplitView
+        orientation={orientation}
+        first={<SqlEditor value={sql} onChange={setSql} onRun={run} />}
+        second={
+          <div className="query-panel__result">
+            {!result && <p className="query-panel__result-placeholder">Run a query to see its output here.</p>}
+            {result?.error && <p className="query-result query-result--error">{result.error}</p>}
+            {result?.outcomes?.map((outcome, i) => (
+              <QueryResultBlock key={i} outcome={outcome} />
+            ))}
+          </div>
+        }
+      />
     </div>
   );
 }

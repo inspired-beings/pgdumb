@@ -16,6 +16,7 @@ pub fn run() {
 
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_store::Builder::default().build())
         .setup(|app| {
             let config_dir = app.path().app_config_dir()?;
             let connection_store = Arc::new(JsonFileConnectionStore::new(

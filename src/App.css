@@ -1,11 +1,21 @@
 :root {
+  --bg: #161616;
+  --bg-panel: #0c0c0c;
+  --fg: #f2f4f8;
+  --fg-muted: #6e6f70;
+  --border: #535353;
+  --element-bg: #2a2a2a;
+  --accent: #3ddbd9;
+  --error: #ee5396;
+  --success: #25be6a;
+
   font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
   font-size: 16px;
   line-height: 24px;
   font-weight: 400;
 
-  color: #0f0f0f;
-  background-color: #f6f6f6;
+  color: var(--fg);
+  background-color: var(--bg);
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -14,10 +24,21 @@
   -webkit-text-size-adjust: 100%;
 }
 
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
 .app {
   margin: 0 auto;
   max-width: 100%;
+  height: 100%;
   padding: 2rem 1.5rem;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
 }
 
 .connection-list__header {
@@ -42,8 +63,7 @@
   gap: 1rem;
   padding: 0.75rem 1rem;
   border-radius: 8px;
-  background-color: #ffffff;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  background-color: var(--element-bg);
 }
 
 .connection-list__actions {
@@ -53,7 +73,7 @@
 
 .connection-list__error,
 .connection-form__error {
-  color: #c0392b;
+  color: var(--error);
 }
 
 .connection-form {
@@ -81,11 +101,11 @@
 }
 
 .connection-form__test-result--success {
-  color: #2e7d32;
+  color: var(--success);
 }
 
 .connection-form__test-result--error {
-  color: #c0392b;
+  color: var(--error);
 }
 
 .connection-form__actions {
@@ -98,12 +118,12 @@ select,
 textarea,
 button {
   border-radius: 8px;
-  border: 1px solid #d0d0d0;
+  border: 1px solid var(--border);
   padding: 0.5em 0.8em;
   font-size: 1em;
   font-family: inherit;
-  color: #0f0f0f;
-  background-color: #ffffff;
+  color: var(--fg);
+  background-color: var(--element-bg);
 }
 
 button {
@@ -113,7 +133,14 @@ button {
 }
 
 button:hover {
-  border-color: #396cd8;
+  border-color: var(--accent);
+}
+
+.connected-view {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
 }
 
 .connected-view__header {
@@ -123,25 +150,111 @@ button:hover {
   margin-bottom: 1rem;
 }
 
+.connected-view__header p {
+  color: var(--fg-muted);
+}
+
 .query-panel {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
-}
-
-.query-panel__input {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  resize: vertical;
+  flex: 1;
+  min-height: 0;
 }
 
 .query-panel__actions {
   display: flex;
   gap: 0.5rem;
+  padding: 0.5rem;
+  border-radius: 8px;
+  background-color: var(--bg-panel);
 }
 
 .query-panel__result {
-  border-top: 1px solid #d0d0d0;
-  padding-top: 0.75rem;
+  height: 100%;
+  padding: 0.75rem 1rem;
+  box-sizing: border-box;
+  background-color: var(--bg-panel);
+}
+
+.query-panel__result-placeholder {
+  color: var(--fg-muted);
+  font-style: italic;
+  margin: 0;
+}
+
+.query-panel__orientation-toggle {
+  font-size: 1.1em;
+  line-height: 1;
+  padding: 0.4em 0.6em;
+}
+
+.split-view {
+  display: flex;
+  gap: 0.75rem;
+  flex: 1;
+  min-height: 0;
+}
+
+.split-view--vertical {
+  flex-direction: row;
+}
+
+.split-view--horizontal {
+  flex-direction: column;
+}
+
+.split-view__pane {
+  flex: 1 1 50%;
+  min-width: 0;
+  min-height: 0;
+  overflow: auto;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.sql-editor {
+  height: 100%;
+}
+
+.cm-editor {
+  height: 100%;
+  border: 1px solid var(--border);
+  background-color: var(--bg);
+  color: var(--fg);
+}
+
+.cm-editor.cm-focused {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.cm-gutters {
+  background-color: var(--bg-panel);
+  border-right: 1px solid var(--border);
+  color: var(--fg-muted);
+}
+
+.cm-sql-keyword {
+  color: #be95ff;
+  font-weight: 600;
+}
+
+.cm-sql-string {
+  color: #25be6a;
+}
+
+.cm-sql-number {
+  color: #3ddbd9;
+}
+
+.cm-sql-comment {
+  color: #6e6f70;
+  font-style: italic;
+}
+
+.cm-sql-operator {
+  color: #b6b8bb;
 }
 
 .query-result {
@@ -151,34 +264,9 @@ button:hover {
 }
 
 .query-result--tag {
-  color: #396cd8;
+  color: var(--accent);
 }
 
 .query-result--error {
-  color: #c0392b;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    color: #f6f6f6;
-    background-color: #2f2f2f;
-  }
-
-  .connection-list__item {
-    background-color: #3a3a3a;
-    box-shadow: none;
-  }
-
-  input,
-  select,
-  textarea,
-  button {
-    color: #ffffff;
-    background-color: #0f0f0f98;
-    border-color: #555555;
-  }
-
-  .query-panel__result {
-    border-top-color: #555555;
-  }
+  color: var(--error);
 }
